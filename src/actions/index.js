@@ -3,6 +3,8 @@
 import connectToDB from "@/database";
 import User from "@/models/user";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 export async function registerUserAction(formData) {
   await connectToDB();
@@ -77,13 +79,22 @@ export async function loginUserAction(formData) {
       };
     }
 
+    const createdTokenData = {
+      id: user._id,
+      userName: user.userName,
+      email: user.email,
+    };
+
+    const token = jwt.sign(createdTokenData, "I_LOVE_YOU_SAFI", {
+      expiresIn: "1d",
+    });
+
+    const getCookies = cookies();
+    getCookies.set("token", token);
+
     // Successful login
     return {
       success: true,
-      data: {
-        userName: user.userName,
-        email: user.email,
-      },
       message: "User logged in successfully!",
     };
   } catch (error) {
