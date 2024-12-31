@@ -52,3 +52,45 @@ export async function registerUserAction(formData) {
     };
   }
 }
+
+export async function loginUserAction(formData) {
+  await connectToDB();
+
+  try {
+    const { email, password } = formData;
+
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return {
+        success: false,
+        message: "Invalid email or password!",
+      };
+    }
+
+    // Compare the hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return {
+        success: false,
+        message: "Invalid email or password!",
+      };
+    }
+
+    // Successful login
+    return {
+      success: true,
+      data: {
+        userName: user.userName,
+        email: user.email,
+      },
+      message: "User logged in successfully!",
+    };
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    return {
+      success: false,
+      message: "Some error occurred! Please try again.",
+    };
+  }
+}
