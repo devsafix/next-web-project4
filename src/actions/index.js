@@ -105,3 +105,40 @@ export async function loginUserAction(formData) {
     };
   }
 }
+
+export async function fetchAuthUserAction() {
+  await connectToDB();
+
+  try {
+    const getCookies = await cookies();
+    const token = getCookies.get("token")?.value || "";
+
+    if (token === "") {
+      return {
+        success: false,
+        message: "Token is invalid! Please try again",
+      };
+    }
+
+    const decodedToken = jwt.verify(token, "I_LOVE_YOU_SAFI");
+    const getUserInfo = await User.findOne({ _id: decodedToken.id });
+
+    if (getUserInfo) {
+      return {
+        success: true,
+        data: JSON.parse(JSON.stringify(getUserInfo)),
+      };
+    } else {
+      return {
+        success: false,
+        message: "Something went wrong! Please try again",
+      };
+    }
+  } catch (error) {
+    console.error("Error registering user:", error);
+    return {
+      success: false,
+      message: "Some error occurred! Please try again",
+    };
+  }
+}
