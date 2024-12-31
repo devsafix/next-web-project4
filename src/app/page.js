@@ -1,11 +1,13 @@
 import { fetchAuthUserAction } from "@/actions";
 import { Button } from "@/components/ui/button";
+import LogoutUser from "@/components/ui/logout-user";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const currentUser = await fetchAuthUserAction();
 
-  console.log(currentUser);
+  if (!currentUser.success) redirect("/sign-in");
 
   return (
     <div className="p-10">
@@ -20,14 +22,16 @@ export default async function Home() {
           <Link href={"/sign-in"}>Sing in</Link>
         </Button>
       </div>
-      <div>
+      <div className="space-y-3">
         <h2 className="text-xl text-red-500 font-semibold">
           Name:{" "}
-          <span className="text-blue-500">{currentUser.data.userName}</span>
+          <span className="text-blue-500">{currentUser?.data.userName}</span>
         </h2>
         <h2 className="text-red-500 font-semibold">
-          Email: <span className="text-blue-500">{currentUser.data.email}</span>
+          Email:{" "}
+          <span className="text-blue-500">{currentUser?.data.email}</span>
         </h2>
+        <LogoutUser />
       </div>
     </div>
   );

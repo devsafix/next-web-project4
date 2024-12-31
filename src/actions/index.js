@@ -142,3 +142,8 @@ export async function fetchAuthUserAction() {
     };
   }
 }
+
+export async function logoutUserAction() {
+  const getCookies = cookies();
+  getCookies.set("token", "");
+}
